@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fcf9f5" />
+    <title>中文动森语音生成器</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='16' cy='21' rx='8' ry='6.5' fill='%2396d3bd'/%3E%3Ccircle cx='7.4' cy='12.7' r='3.3' fill='%2396d3bd'/%3E%3Ccircle cx='13.1' cy='8.4' r='3.3' fill='%2396d3bd'/%3E%3Ccircle cx='20.1' cy='8.4' r='3.3' fill='%2396d3bd'/%3E%3Ccircle cx='25.1' cy='13' r='3.3' fill='%2396d3bd'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <div class="background-pattern" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <header class="app-header">
+        <a class="brand" href="/" aria-label="中文动森语音生成器首页">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <ellipse cx="16" cy="20.8" rx="8" ry="6.5" />
+            <circle cx="7.4" cy="12.7" r="3.3" />
+            <circle cx="13.1" cy="8.4" r="3.3" />
+            <circle cx="20.1" cy="8.4" r="3.3" />
+            <circle cx="25.1" cy="13" r="3.3" />
+          </svg>
+          <strong>Animalese</strong>
+          <span>中文生成器</span>
+        </a>
+
+        <div class="tool-tab" aria-current="page">
+          <span>Voice Studio</span>
+          <i aria-hidden="true"></i>
+        </div>
+
+        <div class="local-status"><i aria-hidden="true"></i>仅在本机运行</div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <div class="hero-copy">
+            <p class="eyebrow">CHINESE ANIMALESE GENERATOR</p>
+            <h1 id="page-title">把中文变成<br /><em>动森语音</em></h1>
+            <p class="hero-description">输入中文文案，生成轻快的角色式拟声语音。所有处理都在本机完成，适合搭配字幕使用。</p>
+          </div>
+
+          <div class="mascot-scene" aria-hidden="true">
+            <span class="mascot-orbit"></span>
+            <span class="spark spark-one">✦</span>
+            <span class="spark spark-two">♡</span>
+            <img src="{{ url_for('static', filename='assets/mascot-cat.webp') }}" alt="" />
+            <div class="speech-note"><span>♪</span> 准备好啦</div>
+          </div>
+        </section>
+
+        <section class="studio-grid" aria-label="语音生成工作区">
+          <article class="studio-card script-card" aria-labelledby="script-title">
+            <header class="card-heading">
+              <div class="card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"/><path d="M15 4v4h4M9 12h6M9 15h6"/></svg>
+              </div>
+              <div>
+                <p class="card-eyebrow">01 · SCRIPT</p>
+                <h2 id="script-title">写下它要说的话</h2>
+              </div>
+              <span id="characterCount" class="character-count">0 / 600</span>
+            </header>
+
+            <div class="script-paper">
+              <span class="paper-tape" aria-hidden="true"></span>
+              <label class="sr-only" for="scriptText">中文文案</label>
+              <textarea id="scriptText" maxlength="600" spellcheck="false">嗨，欢迎来到桌宠小屋！今天我们认识一位住在电脑桌面上的新朋友。它会陪你工作、学习，也会在屏幕边缘散步和休息。你觉得它可爱吗？</textarea>
+            </div>
+
+            <div class="quick-settings" aria-label="常用设置">
+              <label class="field select-field">
+                <span>角色音色</span>
+                <select id="voice">
+                  <option value="lowest">低沉</option>
+                  <option value="low">偏低</option>
+                  <option value="med" selected>标准</option>
+                  <option value="high">明亮</option>
+                </select>
+              </label>
+
+              <label class="field range-field">
+                <span>语速 <output id="speedValue">1.00×</output></span>
+                <input id="speed" type="range" min="0.65" max="1.55" step="0.05" value="1" />
+              </label>
+
+              <label class="field range-field">
+                <span>音高 <output id="pitchValue">+0</output></span>
+                <input id="pitch" type="range" min="-4" max="6" step="1" value="0" />
+              </label>
+            </div>
+
+            <details class="advanced-settings">
+              <summary><span>更多控制</span><i aria-hidden="true">＋</i></summary>
+              <div class="advanced-grid">
+                <label class="field range-field">
+                  <span>音调起伏 <output id="variationValue">100%</output></span>
+                  <input id="variation" type="range" min="0" max="1.6" step="0.1" value="1" />
+                </label>
+
+                <label class="field range-field">
+                  <span>标点停顿 <output id="pauseValue">100%</output></span>
+                  <input id="pauseScale" type="range" min="0.5" max="1.8" step="0.1" value="1" />
+                </label>
+
+                <label class="field select-field">
+                  <span>去气声</span>
+                  <select id="dehiss">
+                    <option value="remap" selected>柔和替代（推荐）</option>
+                    <option value="filter">保留音素并滤波</option>
+                    <option value="off">关闭处理</option>
+                  </select>
+                </label>
+
+                <label class="field select-field">
+                  <span>声音引擎</span>
+                  <select id="backend">
+                    <option value="equalo" selected>角色声库（推荐）</option>
+                    <option value="mandarin">中文音素（实验）</option>
+                  </select>
+                </label>
+
+                <label class="field seed-field">
+                  <span>变化编号</span>
+                  <input id="seed" type="number" min="0" max="2147483647" placeholder="自动生成" />
+                </label>
+              </div>
+            </details>
+
+            <div class="action-row">
+              <button id="generateButton" class="primary-button" type="button">
+                <span class="button-icon" aria-hidden="true">♪</span>
+                <span>生成语音</span>
+              </button>
+              <button id="variationButton" class="secondary-button" type="button">
+                <span aria-hidden="true">↻</span>换一种变化
+              </button>
+            </div>
+            <p class="keyboard-hint">Ctrl + Enter 快速生成</p>
+          </article>
+
+          <article class="studio-card preview-card" aria-labelledby="preview-title">
+            <header class="card-heading">
+              <div class="card-icon blush-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 13h3l2-6 3 12 3-9 2 3h3"/></svg>
+              </div>
+              <div>
+                <p class="card-eyebrow">02 · PREVIEW</p>
+                <h2 id="preview-title">听听它的声音</h2>
+              </div>
+              <span id="resultState" class="result-state" data-state="idle">等待生成</span>
+            </header>
+
+            <div id="visualizer" class="visualizer" data-state="idle">
+              <canvas id="waveform" aria-label="生成音频的波形预览"></canvas>
+              <div class="visualizer-empty">
+                <div class="empty-paw" aria-hidden="true">
+                  <svg viewBox="0 0 32 32"><ellipse cx="16" cy="20.8" rx="8" ry="6.5"/><circle cx="7.4" cy="12.7" r="3.3"/><circle cx="13.1" cy="8.4" r="3.3"/><circle cx="20.1" cy="8.4" r="3.3"/><circle cx="25.1" cy="13" r="3.3"/></svg>
+                </div>
+                <strong>声音会出现在这里</strong>
+                <p>生成后即可试听波形</p>
+              </div>
+            </div>
+
+            <audio id="audioPlayer" controls preload="metadata"></audio>
+
+            <div id="resultMeta" class="result-meta" aria-live="polite">
+              <div><span>DURATION</span><strong id="durationValue">—</strong></div>
+              <div><span>FORMAT</span><strong>WAV · 44.1 kHz</strong></div>
+              <div><span>FILE SIZE</span><strong id="sizeValue">—</strong></div>
+            </div>
+
+            <a id="downloadLink" class="download-button is-disabled" aria-disabled="true">
+              <span aria-hidden="true">↓</span>
+              下载 WAV
+            </a>
+
+            <div id="message" class="message" role="status" aria-live="polite">
+              <span aria-hidden="true">♡</span>
+              <p>柔和替代已开启，会自动避开明显的 s、x、sh 高频气声。</p>
+            </div>
+          </article>
+        </section>
+      </main>
+
+      <footer>
+        <span>Chinese Animalese Generator · Local Tool</span>
+        <span>本地生成，不上传文案与音频</span>
+      </footer>
+    </div>
+  </body>
+</html>
